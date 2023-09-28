@@ -1,0 +1,171 @@
+package industries.sdw.tictactoe;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
+public class MainActivity extends AppCompatActivity {
+
+
+    private int p1Count = 0;
+    private int p2Count = 0;
+    private TextView p1_score,p2_score;
+    boolean playerOneActive;
+    int rounds;
+    private Button b[] = new Button[9];
+    private TextView status;
+
+    int playerState[]={2,2,2,2,2,2,2,2,2};
+    int winPos[][] = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        p1_score = findViewById(R.id.score_player1);
+        p2_score = findViewById(R.id.score_player2);
+        status = findViewById(R.id.status);
+        Button play = findViewById(R.id.play);
+        Button reset = findViewById(R.id.reset);
+
+        playerOneActive = true;
+
+        rounds = 0;
+
+
+
+        b[0] = findViewById(R.id.Button1);
+        b[1] = findViewById(R.id.Button2);
+        b[2] = findViewById(R.id.Button3);
+        b[3] = findViewById(R.id.Button4);
+        b[4] = findViewById(R.id.Button5);
+        b[5] = findViewById(R.id.Button6);
+        b[6] = findViewById(R.id.Button7);
+        b[7] = findViewById(R.id.Button8);
+        b[8] = findViewById(R.id.Button9);
+
+
+
+        View.OnClickListener Click = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!((Button)view).getText().equals(""))
+                    return;
+                else if(checkWinner())
+                    return;
+
+                String ButtonID = view.getResources().getResourceEntryName(view.getId());
+                int gameStatePointer = Integer.parseInt(ButtonID.substring(ButtonID.length()-1,ButtonID.length()));
+
+
+                if (playerOneActive)
+                {
+                    ((Button)view).setText("X");
+                    playerState[gameStatePointer-1] = 0;
+                }
+                else
+                {
+                    ((Button)view).setText("0");
+                    playerState[gameStatePointer-1] = 1;
+                }
+                rounds++;
+                if (checkWinner()){
+                if (playerOneActive)
+                {
+                    p1Count++;
+                    updatePlayerScore();
+                    status.setText("Player-1 has won");
+                }
+                else
+                {
+                    p2Count++;
+                    updatePlayerScore();
+                    status.setText("Player-2 has won");
+                }
+            }
+            if (rounds == 9)
+                status.setText("Match draw");
+
+            else
+                playerOneActive = !playerOneActive;
+
+            reset.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playAgain();
+                    p1Count = 0;
+                    p2Count = 0;
+                    updatePlayerScore();
+
+
+
+                }
+            });
+
+            play.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    playAgain();
+                }
+            });
+
+
+        }
+
+
+
+
+
+
+
+
+    };
+
+        for (int i=0;i<9;i++)
+            b[i].setOnClickListener(Click);
+
+}
+
+    private boolean checkWinner() {
+
+        boolean winnerResults  = false;
+
+        for (int[] winningPositions: winPos)
+
+        {
+
+            if(playerState[winningPositions[0]]==playerState[winningPositions[1]]&&
+                    playerState[winningPositions[1]]==playerState[winningPositions[2]] &&
+                    playerState[winningPositions[0]]!=2)
+                winnerResults = true;
+        }
+        return winnerResults;
+
+
+
+
+    }
+
+    private void playAgain() {
+        playerOneActive = true;
+        rounds = 0;
+        for (int i=0;i<9;i++) {
+            playerState[i] = 2;
+            b[i].setText("");
+
+        }
+        status.setText("");
+    }
+
+    private void updatePlayerScore() {
+
+        p1_score.setText(String.valueOf(p1Count));
+        p2_score.setText(String.valueOf(p2Count));
+    }
+    }
